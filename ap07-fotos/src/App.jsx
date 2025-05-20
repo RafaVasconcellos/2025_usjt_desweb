@@ -3,7 +3,8 @@ import 'primereact/resources/primereact.min.css'
 import 'primeicons/primeicons.css'
 import 'primeflex/primeflex.css'
 import 'primereact/resources/themes/bootstrap4-light-purple/theme.css'
-import { createClient } from 'pexels'
+// import { createClient } from 'pexels'
+import pexelsClient from './utils/pexelsClient'
 import Busca from './components/Busca'
 import ListaImagens from './components/ListaImagens'
 import PexelsLogo from './components/PexelsLogo'
@@ -12,17 +13,29 @@ class App extends Component {
   state = { pics: [] }
 
   pexelsClient = null
-  pexelsKey = import.meta.env.VITE_PEXELS_KEY
+  // pexelsKey = import.meta.env.VITE_PEXELS_KEY
 
-  componentDidMount() {
-    this.pexelsClient = createClient(
-      this.pexelsKey
-    )
-  }
+  // componentDidMount() {
+  //   this.pexelsClient = createClient(
+  //     this.pexelsKey
+  //   )
+  // }
+
+  // onBuscaRealizada = (termo) => {
+  //   this.pexelsClient.photos.search({ query: termo })
+  //     .then((result) => this.setState({ pics: result.photos }))
+  // }
 
   onBuscaRealizada = (termo) => {
-    this.pexelsClient.photos.search({ query: termo })
-      .then((result) => this.setState({ pics: result.photos }))
+    pexelsClient.get('/search', {
+      params: {
+        query: termo
+      }
+    })
+    .then((resultado) => {
+      console.log(resultado)
+      this.setState({ pics: resultado.data.photos})
+    })
   }
 
   render() {
@@ -34,12 +47,16 @@ class App extends Component {
           </div>
           <h1>Exibir uma lista de...</h1>
         </div>
-        <div className='col-8'>
+        <div className='col-12'>
           <Busca
             onBuscaRealizada={this.onBuscaRealizada} />
         </div>
-        <div className='col-8'>
-          <ListaImagens pics={this.state.pics} />
+        <div className='col-12'>
+          <div className="grid">
+            <ListaImagens
+              imgStyle={'col-12 xl:col-3 lg:col-4 md:col-6'}
+              pics={this.state.pics} />
+          </div>
         </div>
       </div>
     )
